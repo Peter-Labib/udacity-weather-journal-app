@@ -1,5 +1,5 @@
 const baseURL = 'https://api.openweathermap.org/data/2.5/weather?zip='
-const APIKey = 'c245c55a62e7f68314803a5b7dd6f654'
+const APIKey = 'c245c55a62e7f68314803a5b7dd6f654&units=metric'
 
 const form = document.getElementById('dataEntry')
 const dateEl = document.getElementById('date')
@@ -17,16 +17,19 @@ function generateData (e) {
   /* generate currently date instance dynamically with JS */
   const date = new Date()
   const dateFormat = date.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-
-  getTemperature(baseURL, zip, APIKey)
-    .then(data => {
+  if (zip.trim() !== '' && feeling.trim() !== '') {
+    getTemperature(baseURL, zip, APIKey)
+      .then(data => {
       /* Add data to POST request */
-      postData('/weatherData', { currentlyDate: dateFormat, temp: data.main.temp, feeling })
-    })
-    .then(() => {
-      updateUI()
-      form.reset()
-    })
+        postData('/weatherData', { currentlyDate: dateFormat, temp: data.main.temp, feeling })
+      })
+      .then(() => {
+        updateUI()
+        form.reset()
+      })
+  } else {
+    alert('please entry a valid zip and feeling')
+  }
 }
 
 /*  get temperature from external API */
@@ -63,7 +66,7 @@ const updateUI = async () => {
   try {
     const allData = await res.json()
     dateEl.innerHTML = `<span>Date today:</span> ${allData.date}`
-    tempEl.innerHTML = `<span>Temperature in kelvin:</span> ${allData.temp}`
+    tempEl.innerHTML = `<span>Temperature in celsius:</span> ${allData.temp}`
     contentEl.innerHTML = `<span>your feeling: </span>${allData.feeling}`
   } catch (error) {
     console.log('error', error)
